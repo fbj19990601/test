@@ -1,0 +1,3 @@
+INSERT INTO `dede_flink` VALUES('22','1','http://www.yiyongtong.com','易用通','','','','1400806595','1','2');
+INSERT INTO `dede_flink` VALUES('21','1','http://www.dede58.com','织梦源码','','','','1400806577','1','2');
+INSERT INTO `dede_flink` VALUES('23','1','http://www.adashuo.com','精品教程','','','','1400806622','1','2');

@@ -1,1 +1,0 @@
-<div class="footer">Copyright 2020 www.wzeshop.com All Rights Reserved</div>

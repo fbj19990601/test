@@ -1,0 +1,2 @@
+INSERT INTO `dede_photos` VALUES('13','10','','','127.0.0.1','');
+INSERT INTO `dede_photos` VALUES('14','10','','','127.0.0.1','');

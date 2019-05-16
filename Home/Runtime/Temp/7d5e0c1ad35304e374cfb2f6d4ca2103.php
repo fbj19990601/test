@@ -1,3 +1,0 @@
-<?php
-//000000086400a:3:{s:4:"type";i:1;s:4:"lang";s:1:"c";s:5:"flash";a:2:{i:0;a:10:{s:2:"id";s:1:"1";s:5:"title";s:9:"广告一";s:6:"etitle";s:3:"ad1";s:4:"type";s:1:"1";s:4:"sort";s:1:"1";s:4:"link";s:1:"/";s:5:"elink";s:1:"/";s:5:"photo";s:17:"53007d7931975.jpg";s:11:"description";s:0:"";s:12:"edescription";s:0:"";}i:1;a:10:{s:2:"id";s:1:"2";s:5:"title";s:9:"广告二";s:6:"etitle";s:3:"ad2";s:4:"type";s:1:"1";s:4:"sort";s:1:"2";s:4:"link";s:1:"/";s:5:"elink";s:1:"/";s:5:"photo";s:17:"5300811240d99.jpg";s:11:"description";s:63:"广告二广告二广告二广告二广告二广告二广告二";s:12:"edescription";s:12:"ad2 ad2 ad2 ";}}}
-?>

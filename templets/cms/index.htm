@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+
+<title>{dede:global.cfg_webname/}</title>
+
+<link rel="icon" href="favicon.ico"    type="image/x-icon"/>
+
+<link rel="stylesheet" type="text/css" href="/style/style.css" />
+
+<script type="text/javascript" src="/style/jquery-1.4.2.min.js"></script>
+
+<script type="text/javascript" src="/style/index.js"></script>
+
+<script type="text/javascript" src="/style/banner.js"></script>
+
+<script type="text/javascript" src="/style/nav.js"></script>
+
+</head>
+
+
+
+<body>
+
+{dede:include filename='header.htm'/}
+
+<div id="banner">
+
+  <div class="dw">
+
+    <div class=slide> 
+
+	<a class="banner_a" style="display: none" id="focus1"><img src="/style/banner_20.jpg" width="1440" height="485"></a>
+
+	<a class="banner_a" id="focus2"><img src="/style/banner_02.jpg" width="1440" height="485">	</a> 
+
+	<a class="banner_a" style="display: none" id="focus3"><img src="/style/banner_03_02.jpg" width="1440" height="485"></a>
+
+      <ul>
+
+        <li id="change1" onmousemove="setFocus(1)">
+
+          <dl>
+
+            <dt><a href="{dede:type typeid='39'}[field:typelink /]{/dede:type}"><img src="/style/img_03.jpg"></a></dt>
+
+            <dd class="tl"><a href="{dede:type typeid='39'}[field:typelink /]{/dede:type}">经营理念</a></dd>
+
+            <dd style="*margin-top:-20px;"><a href="{dede:type typeid='39'}[field:typelink /]{/dede:type}">我们秉承价值投资理念强调通过精深研究发现</a></dd>
+
+          </dl>
+
+        </li>
+
+        <li id="change2" onmousemove="setFocus(2)">
+
+          <dl>
+
+            <dt><a href="{dede:type typeid='40'}[field:typelink /]{/dede:type}"><img src="/style/img_05.jpg"></a></dt>
+
+            <dd class="tl"><a href="{dede:type typeid='40'}[field:typelink /]{/dede:type}">盈利模式</a></dd>
+
+            <dd style="*margin-top:-20px;"><a href="{dede:type typeid='40'}[field:typelink /]{/dede:type}">投资+投行，全面金融解决方案供应商</a></dd>
+
+          </dl>
+
+        </li>
+
+        <li id="change3" class="current" onmousemove="setFocus(3)">
+
+          <dl>
+
+            <dt><a href="{dede:type typeid='38'}[field:typelink /]{/dede:type}"><img src="/style/img_07.jpg"></a></dt>
+
+            <dd class="tl"><a href="{dede:type typeid='38'}[field:typelink /]{/dede:type}">管理团队</a></dd>
+
+            <dd style="*margin-top:-20px;"><a href="{dede:type typeid='38'}[field:typelink /]{/dede:type}">志同道合，丰富的企业运作与投资经验。</a></dd>
+
+          </dl>
+
+        </li>
+
+        </li>
+
+      </ul>
+
+    </div>
+
+  </div>
+
+  <script type=text/javascript>var rollPeriod = 3000;var rollCount = 3;setFocus(1);</script> 
+
+</div>
+
+<div id="main">
+
+  <div class="new">
+   
+    <div class="new_t">
+    <h2><a href="{dede:type typeid='43'}[field:typelink /]{/dede:type}">{dede:type typeid='43'}[field:typename /]{/dede:type}</a></h2><span><a href="{dede:type typeid='43'}[field:typelink /]{/dede:type}"><img src="/style/more.png" /></a></span>
+    </div>
+
+    <ul>
+
+	{dede:arclist typeid='43' row='4' orderby='pubdate' orderway='desc'}
+
+      <li><a href="[field:arcurl/]" style="width:250px; overflow:hidden; display:inline-block;height:26px;">[field:fulltitle function="cn_substr(@me,100)"/]</a><span>[field:pubdate function="MyDate('Y/m/d',@me)"/]</span></li>
+
+	{/dede:arclist}
+
+    </ul>
+
+  </div>
+
+  <div class="about">
+
+   <div class="about_t">
+    <h2><A href="{dede:type typeid='37'}[field:typelink /]{/dede:type}">{dede:type typeid='37'}[field:typename /]{/dede:type}</A></h2><span><a href="{dede:type typeid='37'}[field:typelink /]{/dede:type}"><img src="/style/more.png" /></a></span>
+    </div>
+
+    <p><A href="{dede:type typeid='37'}[field:typelink /]{/dede:type}">{dede:sql sql='Select content from dede_arctype where id=37'}[field:content function="cn_substr(Html2text(@me),180)"/]{/dede:sql}...</A></p>
+
+
+  </div>
+
+  <div class="case">
+
+   <div class="case_t">
+
+    <h2><a href="{dede:type typeid='48'}[field:typelink /]{/dede:type}">{dede:type typeid='48'}[field:typename /]{/dede:type}</a></h2><span><a href="{dede:type typeid='48'}[field:typelink /]{/dede:type}"><img src="/style/more.png" /></a></span>
+    </div>
+ 
+
+    <div class="container">
+
+      <div class="folio_block">
+
+        <div class="main_view">
+
+          <div class="window">
+
+            <div style="width: 3160px;" class="image_reel">
+
+			{dede:arclist typeid='48' row='4' orderby='pubdate' orderway='desc'}
+
+              <dl>
+
+                <dt><img src="[field:litpic/]" height="57" alt="[field:fulltitle/]"></dt>
+
+                <dd>[field:description function="cn_substr(@me,120)"/]</dd>
+
+              </dl>
+
+			{/dede:arclist}
+
+            </div>
+
+          </div>
+
+          <div style="display: block;" class="paging"><a class="active" rel="1"></a><a rel="2"></a><a rel="3"></a><a rel="4"></a></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+{dede:include filename='footer.htm'/}
+ 
+
+</body>
+
+</html>
+

@@ -1,185 +1,381 @@
 <?php
-$installFile='../Home/install.lock';
-$sqlFile='./phpcms.php';
-$configFile='../mysql.php';
-$_config=include'../config.php';
+/**
+ * @version        $Id: index.php 1 13:41 2010Äê7ÔÂ26ÈÕZ tianya $
+ * @package        DedeCMS.Install
+ * @copyright      Copyright (c) 2007 - 2010, DesDev, Inc.
+ * @license        http://help.dedecms.com/usersguide/license.html
+ * @link           http://www.dedecms.com
+ */
+@set_time_limit(0);
+//error_reporting(E_ALL);
+error_reporting(E_ALL || ~E_NOTICE);
 
-if (file_exists($installFile)) {
-    echo '
-        <html>
-        <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        </head>
-        <body>
-        æ‚¨å·²ç»å®‰è£…è¿‡æœ¬ç³»ç»Ÿï¼Œå¦‚æœéœ€é‡æ–°å®‰è£…ï¼Œè¯·å…ˆåˆ é™¤ç«™ç‚¹Homeç›®å½•ä¸‹çš„ install.lock æ–‡ä»¶ï¼Œå†è¿›è¡Œå®‰è£…ã€‚
-        </body>
-        </html>';
-        exit();
+$verMsg = ' V5.7 GBKSP1';
+$s_lang = 'gb2312';
+$dfDbname = 'dedecmsv57gbksp1';
+$errmsg = '';
+$install_demo_name = 'dedev57demo.txt';
+$insLockfile = dirname(__FILE__).'/install_lock.txt';
+$moduleCacheFile = dirname(__FILE__).'/modules.tmp.inc';
+
+define('DEDEINC',dirname(__FILE__).'/../include');
+define('DEDEDATA',dirname(__FILE__).'/../data');
+define('DEDEROOT',preg_replace("#[\\\\\/]install#", '', dirname(__FILE__)));
+header("Content-Type: text/html; charset={$s_lang}");
+
+require_once(DEDEROOT.'/install/install.inc.php');
+require_once(DEDEINC.'/zip.class.php');
+
+foreach(Array('_GET','_POST','_COOKIE') as $_request)
+{
+    foreach($$_request as $_k => $_v) ${$_k} = RunMagicQuotes($_v);
 }
 
-@set_time_limit(1000);
-if (phpversion() <= '5.3.0')
-    set_magic_quotes_runtime(0);
-if ('5.2.0' > phpversion())
-    exit('æ‚¨çš„phpç‰ˆæœ¬è¿‡ä½ï¼Œä¸èƒ½å®‰è£…æœ¬è½¯ä»¶ï¼Œè¯·å‡çº§åˆ°5.2.0æˆ–æ›´é«˜ç‰ˆæœ¬å†å®‰è£…ï¼Œè°¢è°¢ï¼');
+require_once(DEDEINC.'/common.func.php');
 
-date_default_timezone_set('PRC');
-error_reporting(E_ALL & ~E_NOTICE);
-header('Content-Type: text/html; charset=UTF-8');
-
-if (!file_exists($sqlFile) || !file_exists($configFile)) {
-    exit('ç¼ºå°‘å®‰è£…æ–‡ä»¶æˆ–é…ç½®æ–‡ä»¶');
+if(file_exists($insLockfile))
+{
+    exit(" ³ÌĞòÒÑÔËĞĞ°²×°£¬Èç¹ûÄãÈ·¶¨ÒªÖØĞÂ°²×°£¬ÇëÏÈ´ÓFTPÖĞÉ¾³ı install/install_lock.txt£¡");
 }
 
-$Title = "PHPä¼ä¸šç½‘ç«™ç®¡ç†ç³»ç»Ÿ";
-$Powered = "Powered by wzeshop.com";
+if(empty($step))
+{
+    $step = 1;
+}
+/*------------------------
+Ê¹ÓÃĞ­ÒéÊé
+function _1_Agreement()
+------------------------*/
+if($step==1)
+{
+    include('./templates/step-1.html');
+    exit();
+}
+/*------------------------
+»·¾³²âÊÔ
+function _2_TestEnv()
+------------------------*/
+else if($step==2)
+{
+    $phpv = phpversion();
+    $sp_os = PHP_OS;
+    $sp_gd = gdversion();
+    $sp_server = $_SERVER['SERVER_SOFTWARE'];
+    $sp_host = (empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_HOST'] : $_SERVER['REMOTE_ADDR']);
+    $sp_name = $_SERVER['SERVER_NAME'];
+    $sp_max_execution_time = ini_get('max_execution_time');
+    $sp_allow_reference = (ini_get('allow_call_time_pass_reference') ? '<font color=green>[¡Ì]On</font>' : '<font color=red>[¡Á]Off</font>');
+    $sp_allow_url_fopen = (ini_get('allow_url_fopen') ? '<font color=green>[¡Ì]On</font>' : '<font color=red>[¡Á]Off</font>');
+    $sp_safe_mode = (ini_get('safe_mode') ? '<font color=red>[¡Á]On</font>' : '<font color=green>[¡Ì]Off</font>');
+    $sp_gd = ($sp_gd>0 ? '<font color=green>[¡Ì]On</font>' : '<font color=red>[¡Á]Off</font>');
+    $sp_mysql = (function_exists('mysql_connect') ? '<font color=green>[¡Ì]On</font>' : '<font color=red>[¡Á]Off</font>');
 
-$step = (isset($_GET['step'])) ? $_GET['step'] : 1 ;
+    if($sp_mysql=='<font color=red>[¡Á]Off</font>')
+    $sp_mysql_err = TRUE;
+    else
+    $sp_mysql_err = FALSE;
 
-switch ($step) {
-    case '1':
-        include_once('s1.php');
-        exit();
-        break;
+    $sp_testdirs = array(
+        '/',
+        '/plus/*',
+        '/dede/*',
+        '/data/*',
+        '/a/*',
+        '/install',
+        '/special',
+        '/uploads/*'
+    );
+    include('./templates/step-2.html');
+    exit();
+}
+/*------------------------
+ÉèÖÃ²ÎÊı
+function _3_WriteSeting()
+------------------------*/
+else if($step==3)
+{
+    if(!empty($_SERVER['REQUEST_URI']))
+    $scriptName = $_SERVER['REQUEST_URI'];
+    else
+    $scriptName = $_SERVER['PHP_SELF'];
+
+    $basepath = preg_replace("#\/install(.*)$#i", '', $scriptName);
+
+    if(!empty($_SERVER['HTTP_HOST']))
+        $baseurl = 'http://'.$_SERVER['HTTP_HOST'];
+    else
+        $baseurl = "http://".$_SERVER['SERVER_NAME'];
     
-    case '2':
-        $phpv = @ phpversion();
-        $os = PHP_OS;
 
-        $err = 0;
-        if (function_exists('mysql_connect')) {
-            $mysql = '<span class="correct_span">&radic;</span> å·²å®‰è£…';
-        } else {
-            $mysql = '<span class="correct_span error_span">&radic;</span> å‡ºç°é”™è¯¯';
-            $err++;
-        }
-        if (ini_get('file_uploads')) {
-            $uploadSize = '<span class="correct_span">&radic;</span> ' . ini_get('upload_max_filesize');
-        } else {
-            $uploadSize = '<span class="correct_span error_span">&radic;</span>ç¦æ­¢ä¸Šä¼ ';
-        }
-        if (function_exists('session_start')) {
-            $session = '<span class="correct_span">&radic;</span> æ”¯æŒ';
-        } else {
-            $session = '<span class="correct_span error_span">&radic;</span> ä¸æ”¯æŒ';
-            $err++;
-        }
-        $folder = array(
-            '../Home/',
-            '../mysql.php',
-            '../config.php',
-            '../static.php',
-            '../install/',
-            '../install/phpcms.php',
-            '../Uploads/',
-        );
-        include_once ("s2.php");
-        exit();
-        break;
+    $rnd_cookieEncode = chr(mt_rand(ord('A'),ord('Z'))).chr(mt_rand(ord('a'),ord('z'))).chr(mt_rand(ord('A'),ord('Z'))).chr(mt_rand(ord('A'),ord('Z'))).chr(mt_rand(ord('a'),ord('z'))).mt_rand(1000,9999).chr(mt_rand(ord('A'),ord('Z')));
 
-    case '3':
-        include_once ("s3.php");
-        exit();
-        break;
-
-    case '4':
-        $_POST['DB_HOST']=trim($_POST['DB_HOST']);
-        $_POST['DB_USER']=trim($_POST['DB_USER']);
-        $_POST['DB_PWD']=trim($_POST['DB_PWD']);
-        $_POST['DB_NAME']=trim($_POST['DB_NAME']);
-        $conn = @ mysql_connect($_POST['DB_HOST'],$_POST['DB_USER'],$_POST['DB_PWD']);
-        if (!$conn) {
-           $msgs='æç¤ºï¼šæ•°æ®åº“è¿æ¥å¤±è´¥ï¼è¯·æ£€æŸ¥æ•°æ®åº“ä¿¡æ¯æ˜¯å¦æ­£ç¡®ï¼';
-           include_once ("s3.php");
-           exit;
-        }
-        if (!@mysql_select_db($_POST['DB_NAME'])) {
-           $msgs='æç¤ºï¼šæ‰¾ä¸åˆ°æŒ‡å®šçš„æ•°æ®åº“ï¼Œè¯·æ£€æŸ¥â€œæ•°æ®åº“åâ€æ˜¯å¦æ­£ç¡®ï¼Œæˆ–è¯·å…ˆåˆ›å»ºæ•°æ®åº“ï¼';
-           include_once ("s3.php");
-           exit;
-        }
-        mysql_query('SET NAMES UTF8');
-
-        if (setconfig($_POST,$configFile)) {
-            $msgs.='<li><span class="correct_span">&radic;</span>æˆåŠŸå†™å…¥æ•°æ®åº“é…ç½®æ–‡ä»¶</li> ';
-        }else{
-            $msgs='æç¤ºï¼šé…ç½®æ–‡ä»¶å†™å…¥å¤±è´¥ï¼';
-            include_once ("s3.php");
-        }
-
-        include_once ("phpcms.php");
-        $errs=0;
-        foreach ($sqls as $val) {
-            $querysql=re_prefix($val);
-            if (mysql_query($querysql)) {
-              $msgs.='<li><span class="correct_span">&radic;</span>åˆ›å»ºæ•°æ®è¡¨' . create_name($querysql). 'ï¼Œå®Œæˆ</li> ';
-            } else {
-              $msgs.='<li><span class="correct_span error_span">&radic;</span>åˆ›å»ºæ•°æ®è¡¨' . create_name($querysql). 'ï¼Œå¤±è´¥</li> ';
-              $errs++;
-            }
-        }
-
-        foreach ($intosqls as $val) {
-            $querysql=re_prefix($val);
-            if (mysql_query($querysql)) {
-              $msgs.='<li><span class="correct_span">&radic;</span>å·²æˆåŠŸå‘' . into_name($querysql). ' è¡¨æ’å…¥æ•°æ®å®Œæˆ</li> ';
-            } else {
-              $msgs.='<li><span class="correct_span error_span">&radic;</span>å‘' . into_name($querysql). ' è¡¨æ’å…¥æ•°æ®å¤±è´¥</li> ';
-              $errs++;
-            }
-        }
-
-        include_once ("s4.php");
-        exit();
-        break;
-
-    case '5':
-        include_once ("s5.php");
-        @file_put_contents($installFile, "WZCMS INATALL OK ...");
-        exit();
-        break;
-
-    default:
-        # code...
-        break;
+    if(file_get_contents($install_demo_name)) $isdemosign = 1;
+    $module_local = DEDEDATA.'/module/';
+    include('./templates/step-3.html');
+    exit();
 }
+/*------------------------
+ÆÕÍ¨°²×°
+function _4_Setup()
+------------------------*/
+else if($step==4)
+{
+    $conn = mysql_connect($dbhost,$dbuser,$dbpwd) or die("<script>alert('Êı¾İ¿â·şÎñÆ÷»òµÇÂ¼ÃÜÂëÎŞĞ§£¬\\n\\nÎŞ·¨Á¬½ÓÊı¾İ¿â£¬ÇëÖØĞÂÉè¶¨£¡');history.go(-1);</script>");
 
+    mysql_query("CREATE DATABASE IF NOT EXISTS `".$dbname."`;",$conn);
+    
+    mysql_select_db($dbname) or die("<script>alert('Ñ¡ÔñÊı¾İ¿âÊ§°Ü£¬¿ÉÄÜÊÇÄãÃ»È¨ÏŞ£¬ÇëÔ¤ÏÈ´´½¨Ò»¸öÊı¾İ¿â£¡');history.go(-1);</script>");
 
-function setconfig($array,$file){
-  $config=array_merge(include $file , array_change_key_case($array,CASE_UPPER));
-  $str = "<?php\r\nreturn " . var_export($config, true) . ";\r\n?>";
-    if(file_put_contents($file,$str)){
-      return true;
-    }else{
-      return false;
+    //»ñµÃÊı¾İ¿â°æ±¾ĞÅÏ¢
+    $rs = mysql_query("SELECT VERSION();",$conn);
+    $row = mysql_fetch_array($rs);
+    $mysqlVersions = explode('.',trim($row[0]));
+    $mysqlVersion = $mysqlVersions[0].".".$mysqlVersions[1];
+
+    mysql_query("SET NAMES '$dblang',character_set_client=binary,sql_mode='';",$conn);
+
+    $fp = fopen(dirname(__FILE__)."/common.inc.php","r");
+    $configStr1 = fread($fp,filesize(dirname(__FILE__)."/common.inc.php"));
+    fclose($fp);
+
+    $fp = fopen(dirname(__FILE__)."/config.cache.inc.php","r");
+    $configStr2 = fread($fp,filesize(dirname(__FILE__)."/config.cache.inc.php"));
+    fclose($fp);
+
+    //common.inc.php
+    $configStr1 = str_replace("~dbhost~",$dbhost,$configStr1);
+    $configStr1 = str_replace("~dbname~",$dbname,$configStr1);
+    $configStr1 = str_replace("~dbuser~",$dbuser,$configStr1);
+    $configStr1 = str_replace("~dbpwd~",$dbpwd,$configStr1);
+    $configStr1 = str_replace("~dbprefix~",$dbprefix,$configStr1);
+    $configStr1 = str_replace("~dblang~",$dblang,$configStr1);
+
+    @chmod(DEDEDATA,0777);
+    $fp = fopen(DEDEDATA."/common.inc.php","w") or die("<script>alert('Ğ´ÈëÅäÖÃÊ§°Ü£¬Çë¼ì²é../dataÄ¿Â¼ÊÇ·ñ¿ÉĞ´Èë£¡');history.go(-1);</script>");
+    fwrite($fp,$configStr1);
+    fclose($fp);
+
+    //config.cache.inc.php
+    $cmspath = trim(preg_replace("#\/{1,}#", '/', $cmspath));
+    if($cmspath!='' && !preg_match("#^\/#", $cmspath)) $cmspath = '/'.$cmspath;
+
+    if($cmspath=='') $indexUrl = '/';
+    else $indexUrl = $cmspath;
+
+    $configStr2 = str_replace("~baseurl~",$baseurl,$configStr2);
+    $configStr2 = str_replace("~basepath~",$cmspath,$configStr2);
+    $configStr2 = str_replace("~indexurl~",$indexUrl,$configStr2);
+    $configStr2 = str_replace("~cookieEncode~",$cookieencode,$configStr2);
+    $configStr2 = str_replace("~webname~",$webname,$configStr2);
+    $configStr2 = str_replace("~adminmail~",$adminmail,$configStr2);
+
+    $fp = fopen(DEDEDATA.'/config.cache.inc.php','w');
+    fwrite($fp,$configStr2);
+    fclose($fp);
+
+    $fp = fopen(DEDEDATA.'/config.cache.bak.php','w');
+    fwrite($fp,$configStr2);
+    fclose($fp);
+
+    if($mysqlVersion >= 4.1)
+    {
+        $sql4tmp = "ENGINE=MyISAM DEFAULT CHARSET=".$dblang;
     }
-}
+  
+    //´´½¨Êı¾İ±í
+  
+    $query = '';
+    $fp = fopen(dirname(__FILE__).'/sql-dftables.txt','r');
+    while(!feof($fp))
+    {
+        $line = rtrim(fgets($fp,1024));
+        if(preg_match("#;$#", $line))
+        {
+            $query .= $line."\n";
+            $query = str_replace('#@__',$dbprefix,$query);
+            if($mysqlVersion < 4.1)
+            {
+                $rs = mysql_query($query,$conn);
+            } else {
+                if(preg_match('#CREATE#i', $query))
+                {
+                    $rs = mysql_query(preg_replace("#TYPE=MyISAM#i",$sql4tmp,$query),$conn);
+                }
+                else
+                {
+                    $rs = mysql_query($query,$conn);
+                }
+            }
+            $query='';
+        } else if(!preg_match("#^(\/\/|--)#", $line))
+        {
+            $query .= $line;
+        }
+    }
+    fclose($fp);
+    
+    //µ¼ÈëÄ¬ÈÏÊı¾İ
+    $query = '';
+    $fp = fopen(dirname(__FILE__).'/sql-dfdata.txt','r');
+    while(!feof($fp))
+    {
+        $line = rtrim(fgets($fp, 1024));
+        if(preg_match("#;$#", $line))
+        {
+            $query .= $line;
+            $query = str_replace('#@__',$dbprefix,$query);
+            if($mysqlVersion < 4.1) $rs = mysql_query($query,$conn);
+            else $rs = mysql_query(str_replace('#~lang~#',$dblang,$query),$conn);
+            $query='';
+        } else if(!preg_match("#^(\/\/|--)#", $line))
+        {
+            $query .= $line;
+        }
+    }
+    fclose($fp);
 
-function re_prefix($str){
-  $strs=str_replace("lanke_", trim($_POST['DB_PREFIX']), $str);
-  return $strs;
-}
+    //¸üĞÂÅäÖÃ
+    $cquery = "Update `{$dbprefix}sysconfig` set value='{$baseurl}' where varname='cfg_basehost';";
+    mysql_query($cquery,$conn);
+    $cquery = "Update `{$dbprefix}sysconfig` set value='{$cmspath}' where varname='cfg_cmspath';";
+    mysql_query($cquery,$conn);
+    $cquery = "Update `{$dbprefix}sysconfig` set value='{$indexUrl}' where varname='cfg_indexurl';";
+    mysql_query($cquery,$conn);
+    $cquery = "Update `{$dbprefix}sysconfig` set value='{$cookieencode}' where varname='cfg_cookie_encode';";
+    mysql_query($cquery,$conn);
+    $cquery = "Update `{$dbprefix}sysconfig` set value='{$webname}' where varname='cfg_webname';";
+    mysql_query($cquery,$conn);
+    $cquery = "Update `{$dbprefix}sysconfig` set value='{$adminmail}' where varname='cfg_adminemail';";
+    mysql_query($cquery,$conn);
+    
+    //Ôö¼Ó¹ÜÀíÔ±ÕÊºÅ
+    $adminquery = "INSERT INTO `{$dbprefix}admin` VALUES (1, 10, '$adminuser', '".substr(md5($adminpwd),5,20)."', 'admin', '', '', 0, '".time()."', '127.0.0.1');";
+    mysql_query($adminquery,$conn);
+    
+    //¹ØÁ¬Ç°Ì¨»áÔ±ÕÊºÅ
+    $adminquery = "INSERT INTO `{$dbprefix}member` (`mid`,`mtype`,`userid`,`pwd`,`uname`,`sex`,`rank`,`money`,`email`,
+                   `scores` ,`matt` ,`face`,`safequestion`,`safeanswer` ,`jointime` ,`joinip` ,`logintime` ,`loginip` )
+               VALUES ('1','¸öÈË','$adminuser','".md5($adminpwd)."','$adminuser','ÄĞ','100','0','','10000','10','','0','','".time()."','','0',''); ";
+    mysql_query($adminquery,$conn);
 
-function create_name($str){
-  preg_match('/CREATE TABLE IF NOT EXISTS `([^ ]*)`/', $str,$matches);
-  return $matches[1];
-}
+    $adminquery = "INSERT INTO `{$dbprefix}member_person` (`mid`,`onlynet`,`sex`,`uname`,`qq`,`msn`,`tel`,`mobile`,`place`,`oldplace`,`birthday`,`star`,
+                   `income` , `education` , `height` , `bodytype` , `blood` , `vocation` , `smoke` , `marital` , `house` ,`drink` , `datingtype` , `language` , `nature` , `lovemsg` , `address`,`uptime`)
+                VALUES ('1', '1', 'ÄĞ', '{$adminuser}', '', '', '', '', '0', '0','1980-01-01', '1', '0', '0', '160', '0', '0', '0', '0', '0', '0','0', '0', '', '', '', '','0'); ";
+    mysql_query($adminquery,$conn);
 
-function into_name($str){
-  preg_match('/INSERT INTO `([^ ]*)`/', $str,$matches);
-  return $matches[1];
-}
+    $adminquery = "INSERT INTO `{$dbprefix}member_tj` (`mid`,`article`,`album`,`archives`,`homecount`,`pagecount`,`feedback`,`friend`,`stow`)
+                     VALUES ('1','0','0','0','0','0','0','0','0'); ";
+    mysql_query($adminquery,$conn);
 
-function getip(){
-    if (getenv("HTTP_CLIENT_IP"))
-        $ip = getenv("HTTP_CLIENT_IP");
-    else if(getenv("HTTP_X_FORWARDED_FOR"))
-        $ip = getenv("HTTP_X_FORWARDED_FOR");
-    else if(getenv("REMOTE_ADDR"))
-        $ip = getenv("REMOTE_ADDR");
-    else 
-        $ip = "Unknow";
-    return $ip;
-}
+    $adminquery = "Insert Into `{$dbprefix}member_space`(`mid` ,`pagesize` ,`matt` ,`spacename` ,`spacelogo` ,`spacestyle`, `sign` ,`spacenews`)
+                Values('1','10','0','{$adminuser}µÄ¿Õ¼ä','','person','',''); ";
+    mysql_query($adminquery,$conn);
+	
+	//°²×°ÌåÑéÊı¾İ
+    if($installdemo == 1)
+    {
+        if($setupsql = file_get_contents($install_demo_name))
+		{
+			$setupsql = preg_replace("#ENGINE=MyISAM#i", 'TYPE=MyISAM', $setupsql);
+			$sql41tmp = 'ENGINE=MyISAM DEFAULT CHARSET='.$cfg_db_language;
+			if($mysql_version >= 4.1) {
+				$setupsql = preg_replace("#TYPE=MyISAM#i", $sql41tmp, $setupsql);
+			}
+			$setupsql = preg_replace("#_ROOTURL_#i", $rooturl, $setupsql);
+			$setupsql = preg_replace("#[\r\n]{1,}#", "\n", $setupsql);
+			$setupsql = preg_replace('/#@__/i',$dbprefix,$setupsql);
+			$sqls = preg_split("#;[ \t]{0,}\n#", $setupsql);
+			foreach($sqls as $sql) {
+				if(trim($sql)!='') mysql_query($sql,$conn);
+			}
+			// ¸üĞÂÀ¸Ä¿»º´æ
+			UpDateCatCache();
+		} else {
+			die("Ã»ÓĞÌåÑéÊı¾İ°üÎÄ¼ş,Çë¼ì²éÊÇ·ñÏÂÔØ.");
+		}
+    }
 
-?>;
+    //²»°²×°ÈÎºÎ¿ÉÑ¡Ä£¿é
+    if(!isset($modules) || !is_array($modules))
+    {
+        //Ëø¶¨°²×°³ÌĞò
+        $fp = fopen($insLockfile,'w');
+        fwrite($fp,'ok');
+        fclose($fp);
+        include('./templates/step-5.html');
+        exit();
+    }
+    else
+    {
+        $module = join(',',$modules);
+        $fp = fopen($moduleCacheFile,'w');
+        fwrite($fp,'<'.'?php'."\r\n");
+        fwrite($fp,'$selModule = "'.$module.'"; '."\r\n");
+        fwrite($fp,'?'.'>');
+        //Èç¹û²»ÄÜĞ´Èë»º´æÎÄ¼ş£¬ÍË³öÄ£¿é°²×°
+        if(!$fp)
+        {
+            //Ëø¶¨°²×°³ÌĞò
+            $fp = fopen($insLockfile,'w');
+            fwrite($fp,'ok');
+            fclose($fp);
+            $errmsg = "<font color='red'>ÓÉÓÚÎŞ·¨Ğ´ÈëÄ£¿é»º´æ£¬°²×°¿ÉÑ¡Ä£¿éÊ§°Ü£¬ÇëµÇÂ¼ºóÔÚÄ£¿é¹ÜÀí´¦°²×°¡£</font>";
+            include('./templates/step-5.html');
+            exit();
+        }
+        fclose($fp);
+        include('./templates/step-4.html');
+        exit();
+    }
+    exit();
+}
+/*------------------------
+°²×°¿ÉÑ¡Ä£¿é
+function _5_SetupModule()
+------------------------*/
+else if($step==5)
+{
+    header("location:module-install.php");
+    exit();
+}
+/*------------------------
+¼ì²âÊı¾İ¿âÊÇ·ñÓĞĞ§
+function _10_TestDbPwd()
+------------------------*/
+else if($step==10)
+{
+    header("Pragma:no-cache\r\n");
+    header("Cache-Control:no-cache\r\n");
+    header("Expires:0\r\n");
+    $conn = @mysql_connect($dbhost,$dbuser,$dbpwd);
+    if($conn)
+    {
+		if(empty($dbname)){
+			echo "<font color='green'>ĞÅÏ¢ÕıÈ·</font>";
+		}else{
+			$info = mysql_select_db($dbname,$conn)?"<font color='red'>Êı¾İ¿âÒÑ¾­´æÔÚ£¬ÏµÍ³½«¸²¸ÇÊı¾İ¿â</font>":"<font color='green'>Êı¾İ¿â²»´æÔÚ,ÏµÍ³½«×Ô¶¯´´½¨</font>";
+			echo $info;
+		}
+    }
+    else
+    {
+        echo "<font color='red'>Êı¾İ¿âÁ¬½ÓÊ§°Ü£¡</font>";
+    }
+    @mysql_close($conn);
+    exit();
+}
+else if($step==11)
+{
+	require_once('../data/admin/config_update.php');
+	$rmurl = $updateHost."dedecms/demodata.{$s_lang}.txt";
+	
+	$sql_content = file_get_contents($rmurl);
+	$fp = fopen($install_demo_name,'w');
+	if(fwrite($fp,$sql_content))
+		echo '&nbsp; <font color="green">[¡Ì]</font> ´æÔÚ(Äú¿ÉÒÔÑ¡Ôñ°²×°½øĞĞÌåÑé)';
+	else
+		echo '&nbsp; <font color="red">[¡Á]</font> Ô¶³Ì»ñÈ¡Ê§°Ü';
+	unset($sql_content);
+	fclose($fp);
+	exit();
+}

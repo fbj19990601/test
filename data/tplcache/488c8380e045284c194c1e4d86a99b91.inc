@@ -1,1 +1,0 @@
-[field:content function="cn_substr(Html2text(@me),180)"/]

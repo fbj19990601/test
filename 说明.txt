@@ -1,0 +1,5 @@
+使用说明：
+1，访问/ACCN恢复数据
+2，修改数据库连接文件public/db_config.php
+3，删除public/runtime文件夹下的所有文件(否则后台登录出错)
+4，管理后台：/m.php 帐号：admin 密码：www.ac-cn.net
